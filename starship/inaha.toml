@@ -85,7 +85,7 @@ disabled = false
 
 [cmd_duration]
 min_time = 0
-format = '[ $duration](fg:#a0a9cb) '
+format = "[\uf489](fg:#a0a9cb) [$duration](fg:#a0a9cb) "
 
 [memory_usage]
 disabled = false
