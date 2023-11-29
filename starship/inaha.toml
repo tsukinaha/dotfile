@@ -90,6 +90,6 @@ format = "[\uf489](fg:#a0a9cb) [$duration](fg:#a0a9cb) "
 [memory_usage]
 disabled = false
 threshold = -1
-format = "[\uf4bc ](fg:#a0a9cb)[${ram}](fg:#a0a9cb)"
+format = "[\uf4bc ](fg:#a0a9cb)[${ram}](fg:#a0a9cb)" # do not delete the space
 
 
