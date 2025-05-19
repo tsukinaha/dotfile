@@ -26,7 +26,7 @@ input {
         tap
         // dwt
         // dwtp
-        scroll-factor 0.08
+        scroll-factor 0.5
         natural-scroll
         // accel-speed 0.2
         // accel-profile "flat"
@@ -99,6 +99,13 @@ output "eDP-1" {
     // automatically.
 }
 
+output "eDP-2" {
+    off
+    mode "2560x1600@165.019"
+
+    scale 1
+}
+
 output "DP-2" {
     // off
     mode "2560x1440@165.080"
@@ -127,16 +134,21 @@ environment {
     QT_QPA_PLATFORMTHEME "qt6ct"
     ELECTRON_OZONE_PLATFORM_HINT "auto"
     SDL_VIDEODRIVER "wayland"
+    SDL_VIDEO_WAYLAND_ALLOW_LIBDECOR "0"
     NVD_BACKEND "direct"
     DISPLAY ":1"
+    STEAM_FORCE_DESKTOPUI_SCALING "1.5"
+    MOZ_DISABLE_RDD_SANDBOX "1"
+    LIBVA_DRIVER_NAME "nvidia"
 }
 
 prefer-no-csd
 
-spawn-at-startup "waybar"
+spawn-at-startup "swaybg -i ~/Pictures/Wallpapers/output.png"
 spawn-at-startup "swww-daemon"
 spawn-at-startup "fcitx5"
 spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
+spawn-at-startup "wl-paste --watch cliphist store"
 
 // Settings that influence how windows are positioned and sized.
 // Find more information on the wiki:
@@ -144,6 +156,8 @@ spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 layout {
     // Set gaps around windows in logical pixels.
     gaps 12
+    
+    default-column-display "tabbed"
 
     // When to center a column when changing focus, options are:
     // - "never", default behavior, focusing an off-screen column will keep at the left
@@ -152,6 +166,22 @@ layout {
     // - "on-overflow", focusing a column will center it if it doesn't fit
     //   together with the previously focused column.
     center-focused-column "never"
+
+    tab-indicator {
+        // off
+        hide-when-single-tab
+        place-within-column
+        gap 5
+        width 5
+        length total-proportion=1.0
+        position "left"
+        gaps-between-tabs 5
+        corner-radius 20
+        // active-color "red"
+        // inactive-color "gray"
+        active-gradient from="#39c5bb" to="#bbddff" angle=4
+        inactive-gradient from="#505050" to="#808080" angle=45 relative-to="workspace-view"
+    }
 
     // You can customize the widths that "switch-preset-column-width" (Mod+R) toggles between.
     preset-column-widths {
@@ -188,7 +218,7 @@ layout {
     // You can change how the focus ring looks.
     focus-ring {
         // Uncomment this line to disable the focus ring.
-        // off
+        off
 
         // How many logical pixels the ring extends out from the windows.
         width 2
@@ -245,6 +275,28 @@ layout {
         // top 64
         // bottom 64
     }
+
+    shadow {
+        on
+    }
+}
+
+overview {
+    zoom 0.5
+}
+
+layer-rule {
+    match namespace="^wallpaper$"
+    place-within-backdrop true
+
+    match namespace="^rofi$"
+    
+    shadow {
+        on
+    }
+
+    // Fuzzel defaults to 10 px rounded corners.
+    geometry-corner-radius 25
 }
 
 // Add lines like this to spawn processes at startup.
@@ -374,7 +426,7 @@ animations {
 window-rule {
     geometry-corner-radius 12
     clip-to-geometry true
-    opacity 0.93
+    // opacity 0.93
 }
 
 binds {
@@ -474,6 +526,7 @@ binds {
     Mod+Ctrl+Page_Up   { move-column-to-workspace-up; }
     Mod+Ctrl+U         { move-column-to-workspace-down; }
     Mod+Ctrl+I         { move-column-to-workspace-up; }
+    Mod+V              { spawn "sh" "-c" "cliphist list | rofi -dmenu | cliphist decode | wl-copy"; }
 
     // Alternatively, there are commands to move just a single window:
     // Mod+Ctrl+Page_Down { move-window-to-workspace-down; }
@@ -483,6 +536,8 @@ binds {
     Mod+Shift+Page_Up   { move-workspace-up; }
     Mod+Shift+U         { move-workspace-down; }
     Mod+Shift+I         { move-workspace-up; }
+
+    Mod+G { toggle-column-tabbed-display; }
 
     // You can bind mouse wheel scroll ticks using the following syntax.
     // These binds will change direction based on the natural-scroll setting.
@@ -565,8 +620,8 @@ binds {
     Mod+Ctrl+R { reset-window-height; }
     Mod+F { maximize-column; }
     Mod+Shift+F { fullscreen-window; }
-    Mod+C { spawn "sh" "-c" "code-insiders --password-store=gnome --enable-features=UseOzonePlatform --enable-wayland-ime --disable-gpu-compositing"; }
-    Mod+W { spawn "zen-browser"; }
+    Mod+C { spawn "sh" "-c" "code-insiders"; }
+    Mod+W { spawn "firefox-nightly"; }
     Mod+E { spawn "sh" "-c" "nautilus --new-window"; }
 
     // Finer width adjustments.
@@ -606,7 +661,7 @@ binds {
     // moving the mouse or pressing any other key.
     Mod+Shift+P { power-off-monitors; }
 
-    Ctrl+Shift+Q { spawn "sh" "-c" "systemctl poweroff"; }
+    Ctrl+Shift+A { spawn "wlogout"; }
     Ctrl+Shift+L { spawn "sh" "-c" "niri msg action do-screen-transition --delay-ms 300 && swaylock -f"; }
     Ctrl+Shift+S { spawn "sh" "-c" "systemctl suspend"; }
 }
